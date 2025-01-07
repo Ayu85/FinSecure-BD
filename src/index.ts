@@ -11,7 +11,8 @@ const logFilePath = path.join(__dirname, 'logs', 'app.log')
 server.use((req, res, next) => {
   const log = `{url:${req.url},type:${
     req.method
-  },timestamp:${new Date().toLocaleTimeString()}}`
+  },timestamp:${new Date().toLocaleTimeString()}}\n` // Added \n at the end of the log
+
   // Append the log entry to the file
   console.log(log)
   fs.appendFile(logFilePath, log, err => {
