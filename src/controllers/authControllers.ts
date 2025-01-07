@@ -47,6 +47,15 @@ export const registerUser = async (
         missingFields
       })
     }
+    const checkUser = await prismaClient.customer.findFirst({
+      where: {
+        aadharNumber
+      }
+    })
+    if (checkUser)
+      return res
+        .status(400)
+        .json({ message: 'Customer Already Exists', success: false })
     const passwordHash = await bcrypt.hash(password, 10)
     const result = await prismaClient.$transaction(async prisma => {
       const user = await prisma.customer.create({
@@ -63,7 +72,7 @@ export const registerUser = async (
       const account = await prisma.account.create({
         data: {
           accountNumber: generateBankAccountNumber(),
-          ifsc: generateIFSCCode(),
+          ifsc: generateIFSCCode().toUpperCase(),
           ownerId: user.custId
         }
       })
