@@ -6,3 +6,132 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Customer {
+  custId               Int                @id @default(autoincrement())
+  fullName             String
+  aadharNumber         String
+  pan                  String
+  contact              String
+  email                String
+  bankingId            String
+  password             String
+  address              String
+  primaryAccountNumber String?
+  totalAssets          BigInt             @default(0)
+  twoFactorAuthEnabled Boolean            @default(false)
+  twoFactorSecret      String?
+  Account              Account[]
+  Cards                Card[]
+  Wallet               Wallet[]
+  RD                   RecurringDeposit[]
+  Loans                Loan[]
+}
+
+model Admin {
+  adminId  Int    @id
+  username String
+  password String
+  name     String
+  role     String
+}
+
+model Account {
+  accountNumber    String             @id
+  type             String             @default("Savings")
+  ownerId          Int
+  ifsc             String
+  balance          Int                @default(10000)
+  status           String             @default("Active")
+  Cards            Card[]
+  Nominee          Nominee[]
+  owner            Customer           @relation(fields: [ownerId], references: [custId])
+  fromTransactions Transaction[]      @relation("fromAccount")
+  toTransactions   Transaction[]      @relation("toAccount")
+  RD               RecurringDeposit[]
+  Loans            Loan[]
+}
+
+model Card {
+  cardNumber       String   @id
+  type             String
+  ownerId          Int
+  cvv              Int
+  expiry           DateTime
+  pin              Int
+  transactionLimit Int      @default(100000)
+  accountNumber    String
+  Account          Account  @relation(fields: [accountNumber], references: [accountNumber])
+  owner            Customer @relation(fields: [ownerId], references: [custId])
+}
+
+model Wallet {
+  walletId   Int      @id @default(autoincrement())
+  balance    Int      @default(0)
+  ownerId    Int
+  walletName String   @default("Primary Wallet")
+  owner      Customer @relation(fields: [ownerId], references: [custId])
+}
+
+model Nominee {
+  id            Int     @id @default(autoincrement())
+  name          String
+  aadharNumber  String
+  accountNumber String
+  relation      String
+  account       Account @relation(fields: [accountNumber], references: [accountNumber])
+}
+
+model Transaction {
+  id            Int     @id @default(autoincrement())
+  amount        Int
+  fromAccountNo String
+  toAccountNo   String
+  fromAccount   Account @relation("fromAccount", fields: [fromAccountNo], references: [accountNumber])
+  toAccount     Account @relation("toAccount", fields: [toAccountNo], references: [accountNumber])
+}
+
+model RecurringDeposit {
+  id                Int      @id @default(autoincrement())
+  installmentAmount Int
+  nickname          String
+  autoDebitAccount  String
+  maturityDate      DateTime
+  openingDate       DateTime @default(now())
+  maturityAmount    BigInt
+  interestRate      Float
+  tenure            String
+  ownerId           Int
+  installmentsLeft  Int      @default(0)
+  installmentsPaid  Int      @default(0)
+  isActive          Boolean  @default(true)
+  owner             Customer @relation(fields: [ownerId], references: [custId])
+  account           Account  @relation(fields: [autoDebitAccount], references: [accountNumber])
+}
+
+model Loan {
+  id                Int             @id
+  amount            Int
+  type              String
+  tenure            DateTime
+  interestRate      Float
+  appliedOn         DateTime        @default(now())
+  status            String
+  isActive          Boolean         @default(false)
+  accountNumber     String
+  totalInstallments Int             @default(0)
+  installmentsPaid  Int             @default(0)
+  installmentsLeft  Int             @default(0)
+  ownerId           Int
+  owner             Customer        @relation(fields: [ownerId], references: [custId])
+  account           Account         @relation(fields: [accountNumber], references: [accountNumber])
+  LoanRepayment     LoanRepayment[]
+}
+
+model LoanRepayment {
+  id            Int      @id @default(autoincrement())
+  loanId        Int
+  amount        Float
+  repaymentDate DateTime @default(now())
+  loan          Loan     @relation(fields: [loanId], references: [id])
+}
