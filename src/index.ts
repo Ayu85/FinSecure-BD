@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
+import authRoutes from './routes/auth.route'
 dotenv.config()
 const server = express()
 const PORT = process.env.PORT
@@ -21,7 +22,7 @@ server.use((req, res, next) => {
 
   next()
 })
-
+server.use('/api/v1/auth', authRoutes)
 server.listen(PORT, () => {
   console.log(`Banking Server Running on PORT:${PORT}`)
 })
