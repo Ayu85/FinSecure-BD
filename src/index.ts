@@ -3,9 +3,11 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 import authRoutes from './routes/auth.route'
+import { PrismaClient } from '@prisma/client'
 dotenv.config()
 const server = express()
 const PORT = process.env.PORT
+export const prismaClient = new PrismaClient()
 const logFilePath = path.join(__dirname, 'logs', 'app.log')
 
 server.use((req, res, next) => {
@@ -23,6 +25,7 @@ server.use((req, res, next) => {
 
   next()
 })
+server.use(express.json())
 server.use('/api/v1/auth', authRoutes)
 server.listen(PORT, () => {
   console.log(`Banking Server Running on PORT:${PORT}`)

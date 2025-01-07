@@ -16,9 +16,8 @@ model Customer {
   email                String
   bankingId            String
   password             String
-  address              String
   primaryAccountNumber String?
-  totalAssets          BigInt             @default(0)
+  totalAssets          Int             @default(0)
   twoFactorAuthEnabled Boolean            @default(false)
   twoFactorSecret      String?
   Account              Account[]
@@ -26,6 +25,19 @@ model Customer {
   Wallet               Wallet[]
   RD                   RecurringDeposit[]
   Loans                Loan[]
+  Address              Address[]
+}
+
+model Address {
+  id       Int      @id @default(autoincrement())
+  custId   Int
+  postCode String
+  line1    String
+  line2    String
+  landmark String
+  city     String
+  state    String
+  customer Customer @relation(fields: [custId], references: [custId])
 }
 
 model Admin {
@@ -98,7 +110,7 @@ model RecurringDeposit {
   autoDebitAccount  String
   maturityDate      DateTime
   openingDate       DateTime @default(now())
-  maturityAmount    BigInt
+  maturityAmount    Int
   interestRate      Float
   tenure            String
   ownerId           Int
