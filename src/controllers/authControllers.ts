@@ -6,6 +6,7 @@ import {
   generateInternetBankingID
 } from '../utils/utils'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 export const registerUser = async (
   req: Request,
   res: Response
@@ -97,6 +98,45 @@ export const registerUser = async (
       account: result.account,
       address: result.address
     })
+  } catch (error) {
+    console.log(error)
+
+    return res
+      .status(500)
+      .json({ message: 'Internal Server Error', success: false })
+  }
+}
+export const loginUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password)
+      return res.status(400).json({ message: 'missing fields', success: false })
+    const checkUser = await prismaClient.customer.findFirst({
+      where: { email }
+    })
+    if (!checkUser)
+      return res.status(404).json({ message: 'User not found', success: false })
+    const matchPassword = await bcrypt.compare(password, checkUser.password)
+    if (!matchPassword)
+      return res
+        .status(400)
+        .json({ message: 'Invalid Password', success: false })
+    const secret = process.env.JWT_SECRET
+    if (!secret)
+      return res.status(400).json({ message: 'Jwt Auth Error', success: false })
+    const token = jwt.sign({ customerId: checkUser.custId }, secret)
+    const { password: _, ...customerWithoutPass } = checkUser
+    return res
+      .cookie('token', token, {
+        sameSite: true,
+        secure: true,
+        httpOnly: true,
+      })
+      .status(200)
+      .json({ message: 'User logged in', success: true, customerWithoutPass })
   } catch (error) {
     console.log(error)
 
