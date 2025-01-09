@@ -20,3 +20,11 @@ export const createWallet = async (req: Request, res: Response) => {
       .json({ message: 'Internal Server Error', success: false })
   }
 }
+export const selfAccountToWallet = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.body.customer
+    const { walletId, accountNumber } = req.body
+    console.log("success valid");
+    
+  } catch (error) {}
+}
