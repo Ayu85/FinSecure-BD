@@ -6,6 +6,8 @@ declare global {
   namespace Express {
     interface Request {
       customer: any
+      account: any
+      wallet: any
     }
   }
 }
@@ -17,7 +19,7 @@ export const searchUser = async (
 ) => {
   try {
     const { token } = req.cookies
-    
+
     if (!token) {
       return res
         .status(400)
@@ -30,30 +32,12 @@ export const searchUser = async (
     }
 
     const decoded = jwt.verify(token, secret)
-    
+
     req.body.customer = decoded
     next()
   } catch (error) {
-    console.log(error);
-    
+    console.log(error)
+
     return res.status(400).json({ message: 'Auth Error', success: false })
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

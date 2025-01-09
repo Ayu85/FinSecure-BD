@@ -9,16 +9,17 @@ export const validateAccount = async (
   try {
     const { customerId } = req.body.customer
     const { accountNumber } = req.body
-    const matchIdandAc = await prismaClient.account.findFirst({
+    const account = await prismaClient.account.findFirst({
       where: {
         ownerId: customerId,
         accountNumber: accountNumber
       }
     })
-    if (!matchIdandAc)
+    if (!account)
       return res
         .status(401)
         .json({ message: 'Invalid account details', success: false })
+    req.account = account
     next()
   } catch (error) {
     return res

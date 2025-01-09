@@ -11,16 +11,17 @@ export const validateWallet = async (
     const { walletId } = req.body
     console.log(customerId, walletId)
 
-    const searchWalletAndUser = await prismaClient.wallet.findFirst({
+    const wallet = await prismaClient.wallet.findFirst({
       where: {
         walletId: walletId,
         ownerId: customerId
       }
     })
-    if (!searchWalletAndUser)
+    if (!wallet)
       return res
         .status(401)
         .json({ message: 'Invalid Wallet Id', success: false })
+    req.wallet = wallet
     next()
   } catch (error) {
     return res
