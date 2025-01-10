@@ -1,5 +1,10 @@
-import { Request, Response, Router } from 'express'
-import { loginUser, registerUser } from '../controllers/authControllers'
+import { NextFunction, Request, Response, Router } from 'express'
+import {
+  authCheck,
+  loginUser,
+  registerUser
+} from '../controllers/authControllers'
+import { searchUser } from '../middlewares/searchUser'
 
 const router = Router()
 
@@ -9,4 +14,13 @@ router.post('/register-user', (req: Request, res: Response) => {
 router.post('/login-user', (req: Request, res: Response) => {
   loginUser(req, res)
 })
+router.get(
+  '/check-auth',
+  (req: Request, res: Response, next: NextFunction) => {
+    searchUser(req, res, next)
+  },
+  (req: Request, res: Response) => {
+    authCheck(req, res)
+  }
+)
 export default router

@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
+import cors from 'cors'
 import authRoutes from './routes/auth.route'
 import { PrismaClient } from '@prisma/client'
 import { walletRouter } from './routes/wallet.route'
@@ -11,7 +12,6 @@ const server = express()
 const PORT = process.env.PORT
 export const prismaClient = new PrismaClient()
 const logFilePath = path.join(__dirname, 'logs', 'app.log')
-
 server.use((req, res, next) => {
   const log = `{url:${req.url},type:${
     req.method
@@ -27,6 +27,12 @@ server.use((req, res, next) => {
 
   next()
 })
+server.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+  })
+)
 server.use(express.json())
 server.use(cookieParser())
 server.use('/api/v1/auth', authRoutes)

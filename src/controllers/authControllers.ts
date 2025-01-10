@@ -133,15 +133,32 @@ export const loginUser = async (
       .cookie('token', token, {
         sameSite: true,
         secure: true,
-        httpOnly: true,
+        httpOnly: true
       })
       .status(200)
-      .json({ message: 'User logged in', success: true, customerWithoutPass })
+      .json({
+        message: 'User logged in',
+        success: true,
+        user: customerWithoutPass
+      })
   } catch (error) {
     console.log(error)
 
     return res
       .status(500)
       .json({ message: 'Internal Server Error', success: false })
+  }
+}
+export const authCheck = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.body.customer
+    const user = await prismaClient.customer.findFirst({
+      where: { custId: customerId }
+    })
+    return res.status(200).json(user)
+  } catch (error) {
+    console.log(error);
+    
+    return res.status(401).json({ message: 'Unauthorised user' })
   }
 }
