@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express'
 import {
   authCheck,
   loginUser,
+  logout,
   registerUser
 } from '../controllers/authControllers'
 import { searchUser } from '../middlewares/searchUser'
@@ -23,4 +24,7 @@ router.get(
     authCheck(req, res)
   }
 )
+router.post('/logout', (req: Request, res: Response) => {
+  logout(req, res)
+})
 export default router

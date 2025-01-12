@@ -3,7 +3,7 @@ import { prismaClient } from '..'
 
 export const getAccounts = async (req: Request, res: Response) => {
   try {
-    const { customerId } = req.customer
+    const { customerId } = req.body.customer
     const accounts = await prismaClient.account.findMany({
       where: {
         ownerId: customerId

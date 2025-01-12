@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.route'
 import { PrismaClient } from '@prisma/client'
 import { walletRouter } from './routes/wallet.route'
 import cookieParser from 'cookie-parser'
+import accountRoute from './routes/account.route'
 dotenv.config()
 const server = express()
 const PORT = process.env.PORT
@@ -37,6 +38,7 @@ server.use(express.json())
 server.use(cookieParser())
 server.use('/api/v1/auth', authRoutes)
 server.use('/api/v1/wallet', walletRouter)
+server.use('/api/v1/account',accountRoute)
 server.listen(PORT, () => {
   console.log(`Banking Server Running on PORT:${PORT}`)
 })

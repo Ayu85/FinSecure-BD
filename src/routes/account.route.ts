@@ -4,7 +4,7 @@ import { searchUser } from '../middlewares/searchUser'
 
 const accountRoute = Router()
 
-accountRoute.post(
+accountRoute.get(
   '/fetch-accounts',
   (req: Request, res: Response, next: NextFunction) => {
     searchUser(req, res, next)
@@ -13,3 +13,4 @@ accountRoute.post(
     getAccounts(req, res)
   }
 )
+export default accountRoute

@@ -157,8 +157,18 @@ export const authCheck = async (req: Request, res: Response) => {
     })
     return res.status(200).json(user)
   } catch (error) {
-    console.log(error);
-    
+    console.log(error)
+
     return res.status(401).json({ message: 'Unauthorised user' })
+  }
+}
+export const logout = async (req: Request, res: Response) => {
+  try {
+    return res
+      .cookie('token', '')
+      .status(200)
+      .json({ message: 'Logged out successfully' })
+  } catch (error) {
+    return res.status(500).json({message:"Logout failed"})
   }
 }
