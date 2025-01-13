@@ -1,7 +1,10 @@
 import { Request, Response } from 'express'
 import { prismaClient } from '..'
 
-export const createWallet = async (req: Request, res: Response) => {
+export const createWallet = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const { customerId } = req.body.customer
     const { walletName } = req.body
@@ -20,7 +23,10 @@ export const createWallet = async (req: Request, res: Response) => {
       .json({ message: 'Internal Server Error', success: false })
   }
 }
-export const selfAccountToWallet = async (req: Request, res: Response) => {
+export const selfAccountToWallet = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const wallet = req.wallet
     const account = req.account
@@ -59,5 +65,22 @@ export const selfAccountToWallet = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: 'Server error in wallet transfer', success: false })
+  }
+}
+export const fetchWallets = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { customerId } = req.body.customer
+    const wallets = await prismaClient.wallet.findMany({
+      where: { ownerId: customerId }
+    })
+    return res.status(200).json(wallets)
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ message: 'Server error in fetching wallets', success: false })
   }
 }

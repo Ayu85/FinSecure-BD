@@ -38,7 +38,7 @@ server.use(express.json())
 server.use(cookieParser())
 server.use('/api/v1/auth', authRoutes)
 server.use('/api/v1/wallet', walletRouter)
-server.use('/api/v1/account',accountRoute)
+server.use('/api/v1/account',accou  ntRoute)
 server.listen(PORT, () => {
   console.log(`Banking Server Running on PORT:${PORT}`)
 })

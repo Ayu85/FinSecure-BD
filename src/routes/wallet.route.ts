@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import {
   createWallet,
+  fetchWallets,
   selfAccountToWallet
 } from '../controllers/walletControllers'
 import { searchUser } from '../middlewares/searchUser'
@@ -31,6 +32,16 @@ router.post(
   },
   (req: Request, res: Response) => {
     selfAccountToWallet(req, res)
+  }
+)
+
+router.get(
+  '/fetch-wallets',
+  (req: Request, res: Response, next: NextFunction) => {
+    searchUser(req, res, next)
+  },
+  (req: Request, res: Response) => {
+    fetchWallets(req, res)
   }
 )
 
