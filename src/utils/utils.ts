@@ -26,3 +26,12 @@ export function generateInternetBankingID () {
     .padStart(6, '0')
   return bankingID
 }
+export function generateTransactionID () {
+  const chars = `qwurlhfdlhzdfjslfvnvngeuyvnaioyvynvwyemogineog17381df681d8574g36188763781h3d687ghd1786fg564g65d4g56d54gf65d`
+  let id = ''
+  for (let i = 0; i < 8; i++) {
+    let c = Math.floor(Math.random() * chars.length)
+    id += chars.charAt(c)
+  }
+  return id
+}

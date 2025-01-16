@@ -17,7 +17,7 @@ model Customer {
   bankingId            String
   password             String
   primaryAccountNumber String?
-  totalAssets          Int             @default(0)
+  totalAssets          Int                @default(0)
   twoFactorAuthEnabled Boolean            @default(false)
   twoFactorSecret      String?
   Account              Account[]
@@ -57,6 +57,7 @@ model Account {
   status           String             @default("Active")
   Cards            Card[]
   Nominee          Nominee[]
+  openingDate      DateTime           @default(now())
   owner            Customer           @relation(fields: [ownerId], references: [custId])
   fromTransactions Transaction[]      @relation("fromAccount")
   toTransactions   Transaction[]      @relation("toAccount")
@@ -95,12 +96,13 @@ model Nominee {
 }
 
 model Transaction {
-  id            Int     @id @default(autoincrement())
+  id            String      @id 
   amount        Int
   fromAccountNo String
   toAccountNo   String
-  fromAccount   Account @relation("fromAccount", fields: [fromAccountNo], references: [accountNumber])
-  toAccount     Account @relation("toAccount", fields: [toAccountNo], references: [accountNumber])
+  time          DateTime @default(now())
+  fromAccount   Account  @relation("fromAccount", fields: [fromAccountNo], references: [accountNumber])
+  toAccount     Account  @relation("toAccount", fields: [toAccountNo], references: [accountNumber])
 }
 
 model RecurringDeposit {
