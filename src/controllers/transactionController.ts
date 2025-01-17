@@ -15,9 +15,18 @@ export const fetchTransactions = async (req: Request, res: Response) => {
 
     const transactions = await prismaClient.transaction.findMany({
       where: {
-        fromAccountNo: {
-          in: totalAccounts
-        }
+        OR: [
+          {
+            fromAccountNo: {
+              in: totalAccounts
+            }
+          },
+          {
+            toAccountNo: {
+              in: totalAccounts
+            }
+          }
+        ]
       }
     })
 
@@ -37,7 +46,7 @@ export const initiateTransaction = async (req: Request, res: Response) => {
     if (!amount || !fromAccountNo || !toAccountNo || !toIFSC || !toAccountName)
       return res.status(400).json({ message: 'Missing fields', success: false })
     const intAmount = parseInt(amount)
-    
+
     const trans = await prismaClient.$transaction(async prisma => {
       const fromAccount = await prisma.account.findUnique({
         where: {
@@ -56,7 +65,8 @@ export const initiateTransaction = async (req: Request, res: Response) => {
       if (!toAccount) {
         throw new Error("Recipent's account not found")
       }
-      if (intAmount > fromAccount.balance) throw new Error('Insufficient balance')
+      if (intAmount > fromAccount.balance)
+        throw new Error('Insufficient balance')
 
       const fromAccountUpdate = await prisma.account.update({
         where: { accountNumber: fromAccountNo },
@@ -75,7 +85,7 @@ export const initiateTransaction = async (req: Request, res: Response) => {
           id: generateTransactionID(),
           fromAccountNo,
           toAccountNo,
-          amount:intAmount
+          amount: intAmount
         }
       })
       return transacion
