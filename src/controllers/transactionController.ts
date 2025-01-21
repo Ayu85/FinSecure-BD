@@ -35,15 +35,13 @@ export const fetchTransactions = async (req: Request, res: Response) => {
     res.json({ transactions })
   } catch (error) {
     console.error('Error fetching transactions:', error)
-    // Send an error response
     res.status(500).json({ error: 'Failed to fetch transactions' })
   }
 }
 export const initiateTransaction = async (req: Request, res: Response) => {
   try {
-    const { amount, fromAccountNo, toAccountNo, toIFSC, toAccountName } =
-      req.body
-    if (!amount || !fromAccountNo || !toAccountNo || !toIFSC || !toAccountName)
+    const { amount, fromAccountNo, toAccountNo, toIFSC } = req.body
+    if (!amount || !fromAccountNo || !toAccountNo || !toIFSC)
       return res.status(400).json({ message: 'Missing fields', success: false })
     const intAmount = parseInt(amount)
 
@@ -100,5 +98,25 @@ export const initiateTransaction = async (req: Request, res: Response) => {
     const errorMessage =
       error instanceof Error ? error.message : 'Error while fund transfer'
     res.status(500).json({ message: errorMessage, success: false })
+  }
+}
+export const fetchSentTransactions = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.body.customer
+    const accounts = await prismaClient.account.findMany({
+      where: { ownerId: customerId }
+    })
+    let allAccounts = accounts.map(ac => ac.accountNumber)
+    const sentTransactions = await prismaClient.transaction.findMany({
+      where: {
+        fromAccountNo: {
+          in: allAccounts
+        }
+      }
+    })
+    res.json(sentTransactions)
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
+    res.status(500).json({ error: 'Failed to fetch transactions' })
   }
 }
