@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { searchUser } from '../middlewares/searchUser'
-import { fetchSentTransactions, fetchTransactions, initiateTransaction } from '../controllers/transactionController'
+import { fetchRecvdTransactions, fetchSentTransactions, fetchTransactions, initiateTransaction } from '../controllers/transactionController'
 
 const tranactionRoute = Router()
 tranactionRoute.get(
@@ -28,6 +28,15 @@ tranactionRoute.get(
   },
  (req: Request, res: Response) => {
     fetchSentTransactions(req, res)
+  }
+)
+tranactionRoute.get(
+  '/recvd-transactions',
+ (req: Request, res: Response, next: NextFunction) => {
+    searchUser(req, res, next)
+  },
+ (req: Request, res: Response) => {
+    fetchRecvdTransactions(req, res)
   }
 )
 export default tranactionRoute

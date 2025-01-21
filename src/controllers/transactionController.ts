@@ -120,3 +120,23 @@ export const fetchSentTransactions = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch transactions' })
   }
 }
+export const fetchRecvdTransactions = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.body.customer
+    const accounts = await prismaClient.account.findMany({
+      where: { ownerId: customerId }
+    })
+    let allAccounts = accounts.map(ac => ac.accountNumber)
+    const sentTransactions = await prismaClient.transaction.findMany({
+      where: {
+        toAccountNo: {
+          in: allAccounts
+        }
+      }
+    })
+    res.json(sentTransactions)
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
+    res.status(500).json({ error: 'Failed to fetch transactions' })
+  }
+}
