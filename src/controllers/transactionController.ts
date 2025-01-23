@@ -140,3 +140,64 @@ export const fetchRecvdTransactions = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch transactions' })
   }
 }
+
+export const selfTransfer = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { customerId } = req.body.customer
+    const { fromAC, toAC, amount } = req.body
+    if (fromAC === toAC)
+      return res.status(400).json({ message: 'From and To Accounts cant be same', success: false })
+
+    if (!fromAC || !toAC || !amount)
+      return res.status(400).json({ message: 'Missing fields', success: false })
+    const amt = parseInt(amount)
+    const verifyFromAC = await prismaClient.account.findUnique({
+      where: {
+        accountNumber: fromAC,
+        ownerId: customerId
+      }
+    })
+
+    if (verifyFromAC && amt > verifyFromAC?.balance)
+      return res
+        .status(400)
+        .json({ message: 'Insufficient balance', success: false })
+    const verifyToAC = await prismaClient.account.findUnique({
+      where: {
+        accountNumber: toAC,
+        ownerId: customerId
+      }
+    })
+
+    if (!verifyFromAC || !verifyToAC)
+      return res
+        .status(400)
+        .json({ message: 'Account verification failed', success: false })
+    const transaction = await prismaClient.$transaction(async prisma => {
+      const from = await prisma.account.update({
+        where: { accountNumber: fromAC },
+        data: { balance: verifyFromAC.balance - amt }
+      })
+      const to = await prisma.account.update({
+        where: { accountNumber: toAC },
+        data: { balance: verifyToAC.balance + amt }
+      })
+      const trans = await prisma.transaction.create({
+        data: {
+          id: generateTransactionID(),
+          amount: amt,
+          fromAccountNo: fromAC,
+          toAccountNo: toAC
+        }
+      })
+      return { from, to }
+    })
+    return res.status(200).json({ error: 'Self transfer done', transaction })
+  } catch (error) {
+    console.error('Error self transactions:', error)
+    return res.status(500).json({ error: 'Self transfer failed' })
+  }
+}

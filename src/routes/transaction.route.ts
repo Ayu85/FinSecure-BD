@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { searchUser } from '../middlewares/searchUser'
-import { fetchRecvdTransactions, fetchSentTransactions, fetchTransactions, initiateTransaction } from '../controllers/transactionController'
+import { fetchRecvdTransactions, fetchSentTransactions, fetchTransactions, initiateTransaction, selfTransfer } from '../controllers/transactionController'
 
 const tranactionRoute = Router()
 tranactionRoute.get(
@@ -19,6 +19,15 @@ tranactionRoute.post(
   },
  (req: Request, res: Response) => {
     initiateTransaction(req, res)
+  }
+)
+tranactionRoute.post(
+  '/initiate-self-transfer',
+ (req: Request, res: Response, next: NextFunction) => {
+    searchUser(req, res, next)
+  },
+ (req: Request, res: Response) => {
+    selfTransfer(req, res)
   }
 )
 tranactionRoute.get(

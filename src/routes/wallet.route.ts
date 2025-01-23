@@ -7,6 +7,7 @@ import {
 import { searchUser } from '../middlewares/searchUser'
 import { validateWallet } from '../middlewares/validateWallet'
 import { validateAccount } from '../middlewares/validateAccount'
+import { getWalletOwnerName } from '../middlewares/getWalletOwnerName'
 
 const router = Router()
 router.post(
@@ -44,5 +45,8 @@ router.get(
     fetchWallets(req, res)
   }
 )
+router.post('/get-wallet-owner', (req: Request, res: Response) => {
+  getWalletOwnerName(req, res)
+})
 
 export const walletRouter = router
