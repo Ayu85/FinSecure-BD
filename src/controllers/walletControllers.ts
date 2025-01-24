@@ -31,8 +31,8 @@ export const selfAccountToWallet = async (
     const wallet = req.wallet
     const account = req.account
     console.log(wallet, account)
-
     const { walletId, accountNumber, amount } = req.body
+    const amt=parseInt(amount)
     if (amount > account.balance)
       return res.status(400).json({ message: 'Invalid amount', success: false })
     const result = await prismaClient.$transaction(async prisma => {
@@ -41,7 +41,7 @@ export const selfAccountToWallet = async (
           accountNumber: accountNumber
         },
         data: {
-          balance: account.balance - amount
+          balance: account.balance - amt
         }
       })
       const updatedWallet = await prisma.wallet.update({
@@ -49,7 +49,7 @@ export const selfAccountToWallet = async (
           walletId: walletId
         },
         data: {
-          balance: wallet.balance + amount
+          balance: wallet.balance + amt
         }
       })
       return { updatedAccount, updatedWallet }
